@@ -69,6 +69,12 @@
         context.arc(200,300,25,0,3/2*Math.PI,false);
         // (3/2*PI radians = 270 degrees)
         context.stroke();
+        // Modifying the font
+        context.font = '10 pt Arial';
+        context.fillText('This is in 10 pt Arial. . .',330,60);
+        // Drawing stroked text
+        context.font = '16 pt Arial';
+        context.strokeText('This is stroked in 16 pt Arial. . .',330,80);
       }
     </script>
   </head>
