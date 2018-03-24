@@ -92,7 +92,32 @@
         context.fillStyle = "rgba(0,255,0,0.6)";
         // Draw a semi transparent green filled rectangle
         context.fillRect (450,180,100,50);
+        // Get a handle to the image object
+        var image = document.getElementById('spaceship');
+        // Draw the image at (0,350)
+        context.drawImage(image,0,350);
+        // Scaling the image to half the original size
+        context.drawImage(image,0,400,100,25);
+        // Drawing part of the image
+        context.drawImage(image,0,0,60,50,0,420,60,50);
+        //Translate origin to location of object
 
+        context.translate(250, 370);
+        //Rotate about the new origin by 60 degrees
+        context.rotate(Math.PI/3);
+        context.drawImage(image,0,0,60,50,-30,-25,60,50);
+
+        context.rotate(-Math.PI/3);
+        context.translate(-240, -370);
+        //Translate origin to location of object
+        context.translate(300, 370);
+        //Rotate about the new origin
+        context.rotate(3*Math.PI/4);
+        context.drawImage(image,0,0,60,50,-30,-25,60,50);
+        //Restore to original state by rotating and translating back
+        context.rotate(-3*Math.PI/4);
+        context.translate(-300,-370);
+        context.drawImage(image,0,0,300,50,-30,-25,60,50);
       }
     </script>
   </head>
@@ -100,5 +125,6 @@
     <canvas width = "640" height = "480" id = "testcanvas" style = "border:black 1px solid;">
       Your browser does not support HTML5 Canvas. Please shift to another browser.
     </canvas>
+    <img src = "images/spaceship.png" id = "spaceship" />
   </body>
 </html>
