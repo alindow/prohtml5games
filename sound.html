@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv = "Content-type" content = "text/html; charset = utf-8">
+    <title > Sample HTML5 File</title>
+    <script type = "text/javascript" charset = "utf-8">
+      // This function will be called once the page loads completely
+      function pageLoaded(){
+        //Create a new Audio object
+        var sound = new Audio();
+        // Select the source of the sound
+        sound.src = "sounds/music.ogg";
+        // Play the sound
+        sound.play();
+      }
+    </script>
+  </head>
+  <body onload= "pageLoaded();">
+    <audio controls = "controls">
+      <source src = "sounds/music.ogg" type = "audio/ogg" />
+      <source src = "sounds/music.mp3" type = "audio/mpeg" />
+      Your browser does not support HTML5 Audio. Please shift to a newer browser.
+    </audio>
+  </body>
+</html>
