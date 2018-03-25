@@ -16,6 +16,35 @@ var game = {
     $('.gamelayer').hide();
     $('#levelselectscreen').show('slow');
   },
+  hideScreens: function() {
+      var screens = document.getElementsByClassName("gamelayer");
+
+      // Iterate through all the game layers and set their display to none
+      for (let i = screens.length - 1; i >= 0; i--) {
+          var screen = screens[i];
+
+          screen.style.display = "none";
+      }
+  },
+  showScreen: function(id) {
+    var screen = document.getElementById(id);
+    screen.style.display = "block";
+  },
+  start: function() {
+    game.hideScreens();
+
+    // Display the game canvas and score
+    game.showScreen("gamecanvas");
+    game.showScreen("scorescreen");
+
+    game.mode = "intro";
+    game.currentHero = undefined;
+
+    game.offsetLeft = 0;
+    game.ended = false;
+
+    game.animationFrame = window.requestAnimationFrame(game.animate, game.canvas);
+  },
 }
 
 var levels = {
