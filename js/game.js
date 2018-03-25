@@ -9,3 +9,8 @@ var game = {
     game.context = game.canvas.getContext('2d');
   },
 }
+
+// Intialize game once page has fully loaded
+window.addEventListener("load", function() {
+    game.init();
+});
