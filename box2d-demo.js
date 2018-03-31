@@ -22,24 +22,29 @@ function init() {
   var allowSleep = true; //Allow objects that are at rest to fall asleep and be excluded from calculations
   world = new b2World(gravity,allowSleep);
 
-  createFloor();
-  createRectangularBody();
+  createFloor(450);
+  createFloor(0);
+  createWall(0);
+  createWall(640);
+  createTriangle(10);
+  createTriangle(630);
   createCircularBody();
-  createSimplePolygonBody();
-  
+  createSimplePolygonBody(230,200);
+  createSimplePolygonBody(410,200);
+
   setupDebugDraw();
 
   // Start the Box2D animation loop
   animate();
 }
 
-function createFloor() {
+function createFloor(posY) {
   //A body definition holds all the data needed to construct a rigid body.
   var bodyDef = new b2BodyDef;
 
   bodyDef.type = b2Body.b2_staticBody;
   bodyDef.position.x = 640 / 2 / scale;
-  bodyDef.position.y = 450 / scale;
+  bodyDef.position.y = posY / scale;
 
   // A fixture is used to attach a shape to a body for collision detection.
   // A fixture definition is used to create a fixture
@@ -56,41 +61,65 @@ function createFloor() {
   var fixture = body.CreateFixture(fixtureDef);
 }
 
-function createRectangularBody(){
+function createWall(posX) {
+  //A body definition holds all the data needed to construct a rigid body.
   var bodyDef = new b2BodyDef;
-  bodyDef.type = b2Body.b2_dynamicBody;
-  bodyDef.position.x = 40/scale;
-  bodyDef.position.y = 100/scale;
+
+  bodyDef.type = b2Body.b2_staticBody;
+  bodyDef.position.x = posX / scale;
+  bodyDef.position.y = 225 / scale;
+
+  // A fixture is used to attach a shape to a body for collision detection.
+  // A fixture definition is used to create a fixture
   var fixtureDef = new b2FixtureDef;
+
   fixtureDef.density = 1.0;
   fixtureDef.friction = 0.5;
-  fixtureDef.restitution = 0.3;
+  fixtureDef.restitution = 0.2;
+
   fixtureDef.shape = new b2PolygonShape;
-  fixtureDef.shape.SetAsBox(30/scale,50/scale);
+  fixtureDef.shape.SetAsBox(10 / scale, 225 / scale); //640 pixels wide and 20 pixels tall
+
   var body = world.CreateBody(bodyDef);
   var fixture = body.CreateFixture(fixtureDef);
 }
 
-function createCircularBody(){
+function createTriangle(posX) {
   var bodyDef = new b2BodyDef;
-  bodyDef.type = b2Body.b2_dynamicBody;
-  bodyDef.position.x = 130/scale;
-  bodyDef.position.y = 100/scale;
+
+  bodyDef.type = b2Body.b2_staticBody;
+  bodyDef.position.x = posX / scale;
+  bodyDef.position.y = 390 / scale;
+
   var fixtureDef = new b2FixtureDef;
+
   fixtureDef.density = 1.0;
   fixtureDef.friction = 0.5;
-  fixtureDef.restitution = 0.85;
-  fixtureDef.shape = new b2CircleShape(30/scale);
+  fixtureDef.restitution = 0.6;
+
+  fixtureDef.shape = new b2PolygonShape;
+  // Create an array of b2Vec2 points in clockwise direction
+  var points = [
+      new b2Vec2(0, 0),
+      new b2Vec2(40 / scale, 50 / scale),
+      new b2Vec2(-40 / scale, 50 / scale),
+  ];
+
+  // Use SetAsArray to define the shape using the points array
+  fixtureDef.shape.SetAsArray(points, points.length);
+
   var body = world.CreateBody(bodyDef);
+
   var fixture = body.CreateFixture(fixtureDef);
 }
 
-function createSimplePolygonBody() {
+
+function createSimplePolygonBody(posX, posY) {
   var bodyDef = new b2BodyDef;
 
-  bodyDef.type = b2Body.b2_dynamicBody;
-  bodyDef.position.x = 230 / scale;
-  bodyDef.position.y = 50 / scale;
+  bodyDef.type = b2Body.b2_staticBody;
+  bodyDef.position.x = posX / scale;
+  bodyDef.position.y = posY / scale;
 
   var fixtureDef = new b2FixtureDef;
 
@@ -104,6 +133,7 @@ function createSimplePolygonBody() {
       new b2Vec2(0, 0),
       new b2Vec2(40 / scale, 50 / scale),
       new b2Vec2(50 / scale, 100 / scale),
+      new b2Vec2(0, 120 / scale),
       new b2Vec2(-50 / scale, 100 / scale),
       new b2Vec2(-40 / scale, 50 / scale),
   ];
@@ -113,6 +143,20 @@ function createSimplePolygonBody() {
 
   var body = world.CreateBody(bodyDef);
 
+  var fixture = body.CreateFixture(fixtureDef);
+}
+
+function createCircularBody(){
+  var bodyDef = new b2BodyDef;
+  bodyDef.type = b2Body.b2_dynamicBody;
+  bodyDef.position.x = 231/scale;
+  bodyDef.position.y = 10/scale;
+  var fixtureDef = new b2FixtureDef;
+  fixtureDef.density = 1.0;
+  fixtureDef.friction = 0.5;
+  fixtureDef.restitution = 1.1;
+  fixtureDef.shape = new b2CircleShape(30/scale);
+  var body = world.CreateBody(bodyDef);
   var fixture = body.CreateFixture(fixtureDef);
 }
 
