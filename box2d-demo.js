@@ -27,7 +27,8 @@ function init() {
   createCircularBody();
   createSimplePolygonBody();
   createComplexBody();
-
+  createRevoluteJoint();
+  
   setupDebugDraw();
 
   // Start the Box2D animation loop
@@ -141,6 +142,50 @@ function createComplexBody(){
   ];
   fixtureDef.shape.SetAsArray(points,points.length);
   body.CreateFixture(fixtureDef);
+}
+
+function createRevoluteJoint(){
+  //Define the first body
+  var bodyDef1 = new b2BodyDef;
+  bodyDef1.type = b2Body.b2_dynamicBody;
+  bodyDef1.position.x = 480/scale;
+  bodyDef1.position.y = 50/scale;
+  var body1 = world.CreateBody(bodyDef1);
+  //Create first fixture and attach a rectangular shape to the body
+  var fixtureDef1 = new b2FixtureDef;
+  fixtureDef1.density = 1.0;
+  fixtureDef1.friction = 0.5;
+  fixtureDef1.restitution = 0.5;
+  fixtureDef1.shape = new b2PolygonShape;
+  fixtureDef1.shape.SetAsBox(50/scale,10/scale);
+  body1.CreateFixture(fixtureDef1);
+  // Define the second body
+  var bodyDef2 = new b2BodyDef;
+  bodyDef2.type = b2Body.b2_dynamicBody;
+  bodyDef2.position.x = 470/scale;
+  bodyDef2.position.y = 50/scale;
+  var body2 = world.CreateBody(bodyDef2);
+
+  //Create second fixture and attach a polygon shape to the body
+  var fixtureDef2 = new b2FixtureDef;
+  fixtureDef2.density = 1.0;
+  fixtureDef2.friction = 0.5;
+  fixtureDef2.restitution = 0.5;
+  fixtureDef2.shape = new b2PolygonShape;
+  var points = [
+    new b2Vec2(0,0),
+    new b2Vec2(40/scale,50/scale),
+    new b2Vec2(50/scale,100/scale),
+    new b2Vec2(-50/scale,100/scale),
+    new b2Vec2(-40/scale,50/scale),
+  ];
+  fixtureDef2.shape.SetAsArray(points,points.length);
+  body2.CreateFixture(fixtureDef2);
+  // Create a joint between body1 and body2
+  var jointDef = new b2RevoluteJointDef;
+  var jointCenter = new b2Vec2(470/scale,50/scale);
+  jointDef.Initialize(body1, body2, jointCenter);
+  world.CreateJoint(jointDef);
 }
 
 function animate(){
