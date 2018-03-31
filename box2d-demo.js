@@ -11,6 +11,10 @@ var b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef;
 
 var world;
 var scale = 30;
+var timeStep = 1/60;
+//As per the Box2d manual, the suggested iteration count for Box2D is 8 for velocity and 3 for position.
+var velocityIterations = 8;
+var positionIterations = 3;
 
 function init() {
   // Set up the Box2d world that will do most of the physics calculation
@@ -22,7 +26,8 @@ function init() {
 
   setupDebugDraw();
 
-  world.DrawDebugData();
+  // Start the Box2D animation loop
+  animate();
 }
 
 function createFloor() {
@@ -47,6 +52,14 @@ function createFloor() {
   var body = world.CreateBody(bodyDef);
   var fixture = body.CreateFixture(fixtureDef);
 }
+
+function animate(){
+  world.Step(timeStep,velocityIterations,positionIterations);
+  world.ClearForces();
+  world.DrawDebugData();
+  setTimeout(animate, timeStep);
+}
+
 
 var context;
 
