@@ -18,12 +18,13 @@ var positionIterations = 3;
 
 function init() {
   // Set up the Box2d world that will do most of the physics calculation
-  var gravity = new b2Vec2(4.67868,9.8); //declare gravity as 9.8 m/s^2 downward
+  var gravity = new b2Vec2(0,9.8); //declare gravity as 9.8 m/s^2 downward
   var allowSleep = true; //Allow objects that are at rest to fall asleep and be excluded from calculations
   world = new b2World(gravity,allowSleep);
 
   createFloor();
   createRectangularBody();
+  createCircularBody();
 
   setupDebugDraw();
 
@@ -65,6 +66,20 @@ function createRectangularBody(){
   fixtureDef.restitution = 0.3;
   fixtureDef.shape = new b2PolygonShape;
   fixtureDef.shape.SetAsBox(30/scale,50/scale);
+  var body = world.CreateBody(bodyDef);
+  var fixture = body.CreateFixture(fixtureDef);
+}
+
+function createCircularBody(){
+  var bodyDef = new b2BodyDef;
+  bodyDef.type = b2Body.b2_dynamicBody;
+  bodyDef.position.x = 130/scale;
+  bodyDef.position.y = 100/scale;
+  var fixtureDef = new b2FixtureDef;
+  fixtureDef.density = 1.0;
+  fixtureDef.friction = 0.5;
+  fixtureDef.restitution = 0.85;
+  fixtureDef.shape = new b2CircleShape(30/scale);
   var body = world.CreateBody(bodyDef);
   var fixture = body.CreateFixture(fixtureDef);
 }
