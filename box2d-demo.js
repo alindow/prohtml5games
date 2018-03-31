@@ -20,6 +20,9 @@ function init() {
 
   createFloor();
 
+  setupDebugDraw();
+
+  world.DrawDebugData();
 }
 
 function createFloor() {
@@ -43,4 +46,26 @@ function createFloor() {
 
   var body = world.CreateBody(bodyDef);
   var fixture = body.CreateFixture(fixtureDef);
+}
+
+var context;
+
+function setupDebugDraw() {
+    context = document.getElementById("canvas").getContext("2d");
+
+    var debugDraw = new b2DebugDraw();
+
+    // Use this canvas context for drawing the debugging screen
+    debugDraw.SetSprite(context);
+    // Set the scale
+    debugDraw.SetDrawScale(scale);
+    // Fill boxes with an alpha transparency of 0.3
+    debugDraw.SetFillAlpha(0.3);
+    // Draw lines with a thickness of 1
+    debugDraw.SetLineThickness(1.0);
+    // Display all shapes and joints
+    debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+
+    // Start using debug draw in our world
+    world.SetDebugDraw(debugDraw);
 }
