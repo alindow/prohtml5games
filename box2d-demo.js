@@ -25,7 +25,8 @@ function init() {
   createFloor();
   createRectangularBody();
   createCircularBody();
-
+  createSimplePolygonBody();
+  
   setupDebugDraw();
 
   // Start the Box2D animation loop
@@ -83,6 +84,38 @@ function createCircularBody(){
   var body = world.CreateBody(bodyDef);
   var fixture = body.CreateFixture(fixtureDef);
 }
+
+function createSimplePolygonBody() {
+  var bodyDef = new b2BodyDef;
+
+  bodyDef.type = b2Body.b2_dynamicBody;
+  bodyDef.position.x = 230 / scale;
+  bodyDef.position.y = 50 / scale;
+
+  var fixtureDef = new b2FixtureDef;
+
+  fixtureDef.density = 1.0;
+  fixtureDef.friction = 0.5;
+  fixtureDef.restitution = 0.6;
+
+  fixtureDef.shape = new b2PolygonShape;
+  // Create an array of b2Vec2 points in clockwise direction
+  var points = [
+      new b2Vec2(0, 0),
+      new b2Vec2(40 / scale, 50 / scale),
+      new b2Vec2(50 / scale, 100 / scale),
+      new b2Vec2(-50 / scale, 100 / scale),
+      new b2Vec2(-40 / scale, 50 / scale),
+  ];
+
+  // Use SetAsArray to define the shape using the points array
+  fixtureDef.shape.SetAsArray(points, points.length);
+
+  var body = world.CreateBody(bodyDef);
+
+  var fixture = body.CreateFixture(fixtureDef);
+}
+
 
 function animate(){
   world.Step(timeStep,velocityIterations,positionIterations);
