@@ -18,13 +18,13 @@ var positionIterations = 3;
 
 function init() {
   // Set up the Box2d world that will do most of the physics calculation
-  var gravity = new b2Vec2(0,9.8); //declare gravity as 9.8 m/s^2 downward
+  var gravity = new b2Vec2(4.67867,9.8); //declare gravity as 9.8 m/s^2 downward
   var allowSleep = true; //Allow objects that are at rest to fall asleep and be excluded from calculations
   world = new b2World(gravity,allowSleep);
 
   createFloor();
   createRectangularBody();
-  
+
   setupDebugDraw();
 
   // Start the Box2D animation loop
