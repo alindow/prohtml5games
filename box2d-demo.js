@@ -49,7 +49,6 @@ function listenForContact() {
             var impulseAlongNormal = impulse.normalImpulses[0];
 
             specialBody.GetUserData().life -= 1;
-            console.log("The special body was in a collision with impulse", impulseAlongNormal, "and its life has now become ", specialBody.GetUserData().life);
         }
     };
     world.SetContactListener(listener);
@@ -211,8 +210,9 @@ function animate() {
     if (specialBody && specialBody.GetUserData().life <= 0) {
         world.DestroyBody(specialBody);
         specialBody = undefined;
-        console.log("The special body was destroyed");
     }
+
+    document.getElementById('life').textContent=specialBody.GetUserData().life;
 
     setTimeout(animate, timeStep);
 }
