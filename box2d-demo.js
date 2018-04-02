@@ -7,7 +7,6 @@ var b2World = Box2D.Dynamics.b2World;
 var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
 var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
 var b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
-var b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef;
 
 var world;
 var scale = 30;
@@ -22,20 +21,81 @@ function init() {
   var allowSleep = true; //Allow objects that are at rest to fall asleep and be excluded from calculations
   world = new b2World(gravity,allowSleep);
 
-  createFloor(450);
-  createFloor(0);
-  createWall(0);
-  createWall(640);
-  createTriangle(10);
-  createTriangle(630);
-  createCircularBody();
-  createSimplePolygonBody(230,200);
-  createSimplePolygonBody(410,200);
+  createBox();
+
+  createSimplePolygonBody(500,100);
+  createSimplePolygonBody(140,100);
+  createSimplePolygonBody(320,280);
+
+  createSpecialBody();
+
+  listenForContact();
 
   setupDebugDraw();
 
   // Start the Box2D animation loop
   animate();
+}
+
+function listenForContact() {
+    var listener = new Box2D.Dynamics.b2ContactListener;
+
+    listener.PostSolve = function(contact, impulse) {
+        var body1 = contact.GetFixtureA().GetBody();
+        var body2 = contact.GetFixtureB().GetBody();
+
+        // If either of the bodies is the special body, reduce its life
+        if (body1 == specialBody || body2 == specialBody) {
+            var impulseAlongNormal = impulse.normalImpulses[0];
+
+            specialBody.GetUserData().life -= 1;
+            console.log("The special body was in a collision with impulse", impulseAlongNormal, "and its life has now become ", specialBody.GetUserData().life);
+        }
+    };
+    world.SetContactListener(listener);
+}
+
+function drawSpecialBody() {
+    // Get body position and angle
+    var position = specialBody.GetPosition();
+    var angle = specialBody.GetAngle();
+
+    // Translate and rotate axis to body position and angle
+    context.translate(position.x * scale, position.y * scale);
+    context.rotate(angle);
+
+    // Draw a filled circular face
+    life = specialBody.GetUserData().life;
+    context.fillStyle = "rgb(" + life + "," + (256-life) + ",0)";
+    context.beginPath();
+    context.arc(0, 0, 30, 0, 2 * Math.PI, false);
+    context.fill();
+
+    // Draw two rectangular eyes
+    context.fillStyle = "rgb(255, 255, 255)";
+    context.fillRect(-15, -15, 10, 5);
+    context.fillRect(5, -15, 10, 5);
+
+    // Draw an upward or downward arc for a smile depending on life
+    context.strokeStyle = "rgb(255, 255, 255)";
+    context.beginPath();
+    if (specialBody.GetUserData().life > 100) {
+        context.arc(0, 0, 10, Math.PI, 2 * Math.PI, true);
+    } else {
+        context.arc(0, 10, 10, Math.PI, 2 * Math.PI, false);
+    }
+    context.stroke();
+
+    // Translate and rotate axis back to original position and angle
+    context.rotate(-angle);
+    context.translate(-position.x * scale, -position.y * scale);
+}
+
+function createBox(){
+  createFloor(0);
+  createFloor(480);
+  createWall(0);
+  createWall(640);
 }
 
 function createFloor(posY) {
@@ -67,7 +127,7 @@ function createWall(posX) {
 
   bodyDef.type = b2Body.b2_staticBody;
   bodyDef.position.x = posX / scale;
-  bodyDef.position.y = 225 / scale;
+  bodyDef.position.y = 240 / scale;
 
   // A fixture is used to attach a shape to a body for collision detection.
   // A fixture definition is used to create a fixture
@@ -78,41 +138,11 @@ function createWall(posX) {
   fixtureDef.restitution = 0.2;
 
   fixtureDef.shape = new b2PolygonShape;
-  fixtureDef.shape.SetAsBox(10 / scale, 225 / scale); //640 pixels wide and 20 pixels tall
+  fixtureDef.shape.SetAsBox(10 / scale, 230 / scale); //640 pixels wide and 20 pixels tall
 
   var body = world.CreateBody(bodyDef);
   var fixture = body.CreateFixture(fixtureDef);
 }
-
-function createTriangle(posX) {
-  var bodyDef = new b2BodyDef;
-
-  bodyDef.type = b2Body.b2_staticBody;
-  bodyDef.position.x = posX / scale;
-  bodyDef.position.y = 390 / scale;
-
-  var fixtureDef = new b2FixtureDef;
-
-  fixtureDef.density = 1.0;
-  fixtureDef.friction = 0.5;
-  fixtureDef.restitution = 0.6;
-
-  fixtureDef.shape = new b2PolygonShape;
-  // Create an array of b2Vec2 points in clockwise direction
-  var points = [
-      new b2Vec2(0, 0),
-      new b2Vec2(40 / scale, 50 / scale),
-      new b2Vec2(-40 / scale, 50 / scale),
-  ];
-
-  // Use SetAsArray to define the shape using the points array
-  fixtureDef.shape.SetAsArray(points, points.length);
-
-  var body = world.CreateBody(bodyDef);
-
-  var fixture = body.CreateFixture(fixtureDef);
-}
-
 
 function createSimplePolygonBody(posX, posY) {
   var bodyDef = new b2BodyDef;
@@ -146,30 +176,46 @@ function createSimplePolygonBody(posX, posY) {
   var fixture = body.CreateFixture(fixtureDef);
 }
 
-function createCircularBody(){
-  var bodyDef = new b2BodyDef;
-  bodyDef.type = b2Body.b2_dynamicBody;
-  bodyDef.position.x = 231/scale;
-  bodyDef.position.y = 10/scale;
-  var fixtureDef = new b2FixtureDef;
-  fixtureDef.density = 1.0;
-  fixtureDef.friction = 0.5;
-  fixtureDef.restitution = 1.1;
-  fixtureDef.shape = new b2CircleShape(30/scale);
-  var body = world.CreateBody(bodyDef);
-  var fixture = body.CreateFixture(fixtureDef);
+function createSpecialBody() {
+    var bodyDef = new b2BodyDef;
+
+    bodyDef.type = b2Body.b2_dynamicBody;
+    bodyDef.position.x = 450 / scale;
+    bodyDef.position.y = 100 / scale;
+
+    specialBody = world.CreateBody(bodyDef);
+    specialBody.SetUserData({ name: "special", life: 256 });
+
+    //Create a fixture to attach a circular shape to the body
+    var fixtureDef = new b2FixtureDef;
+
+    fixtureDef.density = 1.0;
+    fixtureDef.friction = 0.5;
+    fixtureDef.restitution = 1.1;
+
+    fixtureDef.shape = new b2CircleShape(30 / scale);
+
+    var fixture = specialBody.CreateFixture(fixtureDef);
 }
 
+function animate() {
+    world.Step(timeStep, velocityIterations, positionIterations);
+    world.ClearForces();
+    world.DrawDebugData();
+    // Custom Drawing
+    if (specialBody) {
+        drawSpecialBody();
+    }
 
-function animate(){
-  world.Step(timeStep,velocityIterations,positionIterations);
-  world.ClearForces();
-  world.DrawDebugData();
-  setTimeout(animate, timeStep);
+    //Kill Special Body if Dead
+    if (specialBody && specialBody.GetUserData().life <= 0) {
+        world.DestroyBody(specialBody);
+        specialBody = undefined;
+        console.log("The special body was destroyed");
+    }
+
+    setTimeout(animate, timeStep);
 }
-
-
-var context;
 
 function setupDebugDraw() {
     context = document.getElementById("canvas").getContext("2d");
