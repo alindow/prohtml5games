@@ -1,3 +1,14 @@
+var entities = {
+  definitions:{
+    "glass": {
+      fullHealth: 100,
+      density: 2.4,
+      friction: 0.4,
+      restitution: 0.15,
+    }
+  }
+}
+
 var game = {
     // Start initializing objects, preloading assets and display start screen
     init: function() {
