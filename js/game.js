@@ -65,6 +65,12 @@ var entities = {
       restitution:0.4,
     }
   },
+  // take the entity, create a Box2D body, and add it to the world
+  create:function(entity){
+  },
+  // take the entity, its position, and its angle and draw it on the game canvas
+  draw:function(entity,position,angle){
+  }
 }
 
 var game = {
