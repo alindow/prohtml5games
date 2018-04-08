@@ -14,8 +14,7 @@ var box2d = {
   init:function(){
     // Set up the Box2D world that will do most of the physics calculation
     var gravity = new b2Vec2(0,9.8); //declare gravity as 9.8 m/s^2 downward
-    var allowSleep = true; //Allow objects that are at rest to fall asleep and be excluded from
-    calculations
+    var allowSleep = true; //Allow objects that are at rest to fall asleep and be excluded from calculations
     box2d.world = new b2World(gravity,allowSleep);
   },
   createRectangle:function(entity,definition){
@@ -71,7 +70,7 @@ var entities = {
       fullHealth: 100,
       density: 2.4,
       friction: 0.4,
-      restitution: 0.15,
+      restitution: 0.15
     },
     "wood":{
       fullHealth:500,
@@ -199,9 +198,12 @@ var game = {
         loader.init();
         mouse.init();
 
-        // Hide all game layers and display the start screen
-        game.hideScreens();
-        game.showScreen("gamestartscreen");
+        // Load All Sound Effects and Background Music
+        game.loadSounds(function() {
+            // Hide all game layers and display the start screen
+            game.hideScreens();
+            game.showScreen("gamestartscreen");
+        });
     },
 
     hideScreens: function() {
@@ -386,6 +388,18 @@ var game = {
             game.animationFrame = window.requestAnimationFrame(game.animate, game.canvas);
         }
     },
+    loadSounds: function(onload) {
+        game.backgroundMusic = loader.loadSound("audio/gurdonark-kindergarten");
+
+        game.slingshotReleasedSound = loader.loadSound("audio/released");
+        game.bounceSound = loader.loadSound("audio/bounce");
+        game.breakSound = {
+            "glass": loader.loadSound("audio/glassbreak"),
+            "wood": loader.loadSound("audio/woodbreak")
+        };
+
+        loader.onload = onload;
+    },
 
 };
 
@@ -394,11 +408,44 @@ var levels = {
     data: [{   // First level
         foreground: "desert-foreground",
         background: "clouds-background",
-        entities: []
+        entities: [
+          // The ground
+          { type: "ground", name: "dirt", x: 500, y: 440, width: 1000, height: 20, isStatic: true },
+          // The slingshot wooden frame
+          { type: "ground", name: "wood", x: 190, y: 390, width: 30, height: 80, isStatic: true },
+
+          { type: "block", name: "wood", x: 500, y: 380, angle: 90, width: 100, height: 25 },
+          { type: "block", name: "glass", x: 500, y: 280, angle: 90, width: 100, height: 25 },
+          { type: "villain", name: "burger", x: 500, y: 205, calories: 590 },
+
+          { type: "block", name: "wood", x: 800, y: 380, angle: 90, width: 100, height: 25 },
+          { type: "block", name: "glass", x: 800, y: 280, angle: 90, width: 100, height: 25 },
+          { type: "villain", name: "fries", x: 800, y: 205, calories: 420 },
+
+          { type: "hero", name: "orange", x: 80, y: 405 },
+          { type: "hero", name: "apple", x: 140, y: 405 }
+        ]
     }, {   // Second level
         foreground: "desert-foreground",
         background: "clouds-background",
-        entities: []
+        entities: [
+          {type:"ground", name:"dirt", x:500,y:440,width:1000,height:20,isStatic:true},
+          {type:"ground", name:"wood", x:180,y:390,width:40,height:80,isStatic:true},
+          {type:"block", name:"wood", x:820,y:375,angle:90,width:100,height:25},
+          {type:"block", name:"wood", x:720,y:375,angle:90,width:100,height:25},
+          {type:"block", name:"wood", x:620,y:375,angle:90,width:100,height:25},
+          {type:"block", name:"glass", x:670,y:310,width:100,height:25},
+          {type:"block", name:"glass", x:770,y:310,width:100,height:25},
+          {type:"block", name:"glass", x:670,y:248,angle:90,width:100,height:25},
+          {type:"block", name:"glass", x:770,y:248,angle:90,width:100,height:25},
+          {type:"block", name:"wood", x:720,y:180,width:100,height:25},
+          {type:"villain", name:"burger",x:715,y:160,calories:590},
+          {type:"villain", name:"fries",x:670,y:400,calories:420},
+          {type:"villain", name:"sodacan",x:765,y:395,calories:150},
+          {type:"hero", name:"strawberry",x:40,y:420},
+          {type:"hero", name:"orange",x:90,y:410},
+          {type:"hero", name:"apple",x:150,y:410}
+        ]
     }],
 
     // Initialize level selection screen
@@ -428,9 +475,11 @@ var levels = {
 
     // Load all data and images for a specific level
     load: function(number) {
+        // Initialize Box2D world whenever a level is loaded
+        box2d.init();
 
         // Declare a new currentLevel object
-        game.currentLevel = { number: number };
+        game.currentLevel = { number: number, hero: [] };
         game.score = 0;
 
         document.getElementById("score").innerHTML = "Score: " + game.score;
@@ -441,6 +490,13 @@ var levels = {
         game.currentLevel.foregroundImage = loader.loadImage("images/backgrounds/" + level.foreground + ".png");
         game.slingshotImage = loader.loadImage("images/slingshot.png");
         game.slingshotFrontImage = loader.loadImage("images/slingshot-front.png");
+
+        // Load all the entities
+        for (let i = level.entities.length - 1; i >= 0; i--) {
+            var entity = level.entities[i];
+
+            entities.create(entity);
+        }
 
         // Call game.start() once the assets have loaded
         loader.onload = game.start;
